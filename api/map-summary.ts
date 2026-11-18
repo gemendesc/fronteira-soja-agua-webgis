@@ -1,7 +1,10 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { computeSpearman, getSql, quantileThresholds } from "./_db.js";
 
-type EixoY = "agua_virtual" | "comex_ton" | "pam_ton" | "irrig_hm3";
+type EixoY = "pegada_soja" | "pam_ton" | "irrig_hm3" | "comex_ton";
+
+// Pegada hídrica total média da soja brasileira (Hoekstra & Mekonnen): 2.050 m³/t
+const SOJA_WF_HM3_PER_TON = 2050.0 / 1_000_000.0;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {
@@ -15,15 +18,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const uf = String(req.query.uf || "TODAS").toUpperCase();
     const anoIni = Math.max(2013, Math.min(2024, Number(req.query.ano_ini || 2013)));
     const anoFim = Math.max(anoIni, Math.min(2024, Number(req.query.ano_fim || 2024)));
-    const lag = Math.max(0, Math.min(3, Number(req.query.lag || 0)));
-    const eixoY = (["agua_virtual", "comex_ton", "pam_ton", "irrig_hm3"].includes(
+    const lag = Math.max(0, Math.min(3, Number(req.query.lag ?? 2)));
+    const eixoY = (["pegada_soja", "pam_ton", "irrig_hm3", "comex_ton"].includes(
       String(req.query.eixo_y)
     )
       ? String(req.query.eixo_y)
-      : "agua_virtual") as EixoY;
+      : "pegada_soja") as EixoY;
 
-    // Janela com defasagem temporal (lag):
-    // Desmatamento avaliado em [anoIni, desmatFim] e resposta produtiva/hídrica em [respIni, anoFim]
     const desmatFim = Math.max(anoIni, anoFim - lag);
     const respIni = Math.min(anoFim, anoIni + lag);
 
@@ -82,6 +83,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         COALESCE(r.comex_ton, 0) AS comex_ton,
         COALESCE(r.comex_usd, 0) AS comex_usd,
         COALESCE(r.pam_ton, 0) AS pam_ton,
+        ROUND((COALESCE(r.pam_ton, 0) * ${SOJA_WF_HM3_PER_TON})::numeric, 2)::float8 AS pegada_soja_hm3,
         COALESCE(r.pam_area_max_ha, 0) AS pam_area_max_ha,
         COALESCE(r.agua_virtual_hm3, 0) AS agua_virtual_hm3,
         COALESCE(r.irrig_hm3, 0) AS irrig_hm3,
@@ -89,7 +91,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       FROM filtro_mun m
       LEFT JOIN desmat d ON d.cd_mun = m.cd_mun
       LEFT JOIN resposta r ON r.cd_mun = m.cd_mun
-      ORDER BY COALESCE(r.agua_virtual_hm3, 0) DESC, COALESCE(d.desmat_km2, 0) DESC;
+      ORDER BY COALESCE(r.pam_ton, 0) DESC, COALESCE(d.desmat_km2, 0) DESC;
     `;
 
     const serieRows = await sql`
@@ -98,6 +100,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ROUND(SUM(f.prodes_incr_km2)::numeric, 2)::float8 AS desmat_km2,
         ROUND((SUM(f.comex_soja_exp_ton) / 1e6)::numeric, 3)::float8 AS comex_mton,
         ROUND((SUM(f.soja_producao_ton) / 1e6)::numeric, 3)::float8 AS pam_mton,
+        ROUND((SUM(f.soja_producao_ton) * ${SOJA_WF_HM3_PER_TON})::numeric, 2)::float8 AS pegada_soja_hm3,
         ROUND(SUM(f.agua_virtual_exp_hm3)::numeric, 2)::float8 AS agua_virtual_hm3,
         ROUND(SUM(f.agua_irrig_hm3_ano)::numeric, 2)::float8 AS irrig_hm3
       FROM agro_hidro.fato_anual_municipio f
@@ -140,15 +143,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const pickY = (r: any): number => {
       switch (eixoY) {
-        case "comex_ton":
-          return r.comex_ton;
         case "pam_ton":
           return r.pam_ton;
         case "irrig_hm3":
           return r.irrig_hm3;
-        case "agua_virtual":
+        case "comex_ton":
+          return r.comex_ton;
+        case "pegada_soja":
         default:
-          return r.agua_virtual_hm3;
+          return r.pegada_soja_hm3;
       }
     };
 
@@ -162,9 +165,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const valX = r.desmat_km2;
       const valY = pickY(r);
 
-      const tierX = valX <= qx1 ? "1" : valX <= qx2 ? "2" : "3";
-      const tierY = valY <= qy1 ? "A" : valY <= qy2 ? "B" : "C";
-      const bivClass = valX === 0 && valY === 0 ? "A1" : `${tierY}${tierX}`;
+      const tierX = valX <= 0 ? "1" : valX <= qx1 ? "1" : valX <= qx2 ? "2" : "3";
+      const tierY = valY <= 0 ? "A" : valY <= qy1 ? "A" : valY <= qy2 ? "B" : "C";
+      const bivClass = `${tierY}${tierX}`;
       classCounts[bivClass] = (classCounts[bivClass] || 0) + 1;
 
       return {
@@ -174,21 +177,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
     });
 
-    // Correlação calculada sobre municípios com presença da cultura/indicador no recorte
-    const activeForCorr = enriched.filter((r: any) => r.y_value > 0 || r.pam_ton > 0);
-    const corrPool = activeForCorr.length >= 10 ? activeForCorr : enriched;
+    // Calcula Spearman tanto em todos os municípios do recorte quanto nos municípios com presença ativa
+    const activePool = enriched.filter((r: any) => r.y_value > 0 || r.pam_ton > 0);
+    const pool = activePool.length >= 12 ? activePool : enriched;
     const spearman = computeSpearman(
-      corrPool.map((r: any) => r.desmat_km2),
-      corrPool.map((r: any) => r.y_value)
+      pool.map((r: any) => r.desmat_km2),
+      pool.map((r: any) => r.y_value)
     );
 
     const kpis = enriched.reduce(
       (acc: any, r: any) => {
         acc.total_municipios += 1;
+        if (r.pam_ton > 0) acc.mun_produtores_pam += 1;
+        if (r.comex_ton > 0) acc.mun_exportadores_comex += 1;
         acc.desmat_total_km2 += r.desmat_km2;
         acc.comex_total_ton += r.comex_ton;
         acc.comex_total_usd += r.comex_usd;
         acc.pam_total_ton += r.pam_ton;
+        acc.pegada_soja_total_hm3 += r.pegada_soja_hm3;
         acc.agua_virtual_total_hm3 += r.agua_virtual_hm3;
         acc.irrig_total_hm3 += r.irrig_hm3;
         if (r.biv_class === "C3") acc.municipios_criticos_c3 += 1;
@@ -196,11 +202,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
       {
         total_municipios: 0,
+        mun_produtores_pam: 0,
+        mun_exportadores_comex: 0,
         municipios_criticos_c3: 0,
         desmat_total_km2: 0,
         comex_total_ton: 0,
         comex_total_usd: 0,
         pam_total_ton: 0,
+        pegada_soja_total_hm3: 0,
         agua_virtual_total_hm3: 0,
         irrig_total_hm3: 0,
       }

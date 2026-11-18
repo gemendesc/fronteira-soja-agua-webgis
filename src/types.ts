@@ -1,4 +1,4 @@
-export type EixoYKey = "agua_virtual" | "comex_ton" | "pam_ton" | "irrig_hm3";
+export type EixoYKey = "pegada_soja" | "pam_ton" | "irrig_hm3" | "comex_ton";
 export type RecorteKey = "todos" | "matopiba" | "arco" | "amazonia" | "cerrado";
 
 export interface MunicipioSummary {
@@ -14,6 +14,7 @@ export interface MunicipioSummary {
   comex_ton: number;
   comex_usd: number;
   pam_ton: number;
+  pegada_soja_hm3: number;
   pam_area_max_ha: number;
   agua_virtual_hm3: number;
   irrig_hm3: number;
@@ -39,11 +40,14 @@ export interface MapSummaryResponse {
   };
   kpis: {
     total_municipios: number;
+    mun_produtores_pam: number;
+    mun_exportadores_comex: number;
     municipios_criticos_c3: number;
     desmat_total_km2: number;
     comex_total_ton: number;
     comex_total_usd: number;
     pam_total_ton: number;
+    pegada_soja_total_hm3: number;
     agua_virtual_total_hm3: number;
     irrig_total_hm3: number;
   };
@@ -64,6 +68,7 @@ export interface MapSummaryResponse {
     desmat_km2: number;
     comex_mton: number;
     pam_mton: number;
+    pegada_soja_hm3: number;
     agua_virtual_hm3: number;
     irrig_hm3: number;
   }>;

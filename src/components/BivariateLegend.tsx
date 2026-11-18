@@ -10,6 +10,7 @@ interface Props {
 
 const ROWS = ["C", "B", "A"];
 const COLS = ["1", "2", "3"];
+const LIGHT_CELLS = new Set(["A1", "A2", "B1"]);
 
 export const BivariateLegend: React.FC<Props> = ({
   selectedClass,
@@ -20,15 +21,14 @@ export const BivariateLegend: React.FC<Props> = ({
   return (
     <div className="biv-legend-card" role="region" aria-label="Legenda Bivariada 3x3">
       <div className="biv-legend-header">
-        <span className="biv-legend-title">Matriz Bivariada (Tercis)</span>
+        <span className="biv-legend-title">LEGENDA BIVARIADA (TERCIS)</span>
         {selectedClass && (
           <button
             type="button"
             className="biv-clear-btn"
             onClick={() => onSelectClass(null)}
-            title="Limpar filtro de classe"
           >
-            Limpar ({selectedClass})
+            Limpar filtro ({selectedClass})
           </button>
         )}
       </div>
@@ -46,6 +46,7 @@ export const BivariateLegend: React.FC<Props> = ({
                 const isSelected = selectedClass === code;
                 const isDimmed = selectedClass !== null && !isSelected;
                 const count = classCounts[code] || 0;
+                const darkInk = LIGHT_CELLS.has(code);
                 return (
                   <button
                     key={code}
@@ -53,7 +54,10 @@ export const BivariateLegend: React.FC<Props> = ({
                     className={`biv-cell ${isSelected ? "is-selected" : ""} ${
                       isDimmed ? "is-dimmed" : ""
                     }`}
-                    style={{ backgroundColor: BIVARIATE_COLORS[code] }}
+                    style={{
+                      backgroundColor: BIVARIATE_COLORS[code],
+                      color: darkInk ? "#1e2328" : "#f8faf9",
+                    }}
                     onClick={() => onSelectClass(isSelected ? null : code)}
                     title={`${code} — ${BIVARIATE_LABELS[code]} (${count} municípios)`}
                   >
@@ -64,7 +68,7 @@ export const BivariateLegend: React.FC<Props> = ({
             )}
           </div>
           <div className="biv-axis-x">
-            <span>Desmatamento PRODES →</span>
+            <span>Supressão PRODES (km²) →</span>
           </div>
         </div>
       </div>
@@ -72,7 +76,7 @@ export const BivariateLegend: React.FC<Props> = ({
       <p className="biv-legend-hint">
         {selectedClass
           ? `${BIVARIATE_LABELS[selectedClass]} (${classCounts[selectedClass] || 0} mun.)`
-          : "Clique em um quadrante para filtrar o mapa"}
+          : "Clique em qualquer célula (ex.: C3) para isolar os municípios correspondentes."}
       </p>
     </div>
   );
