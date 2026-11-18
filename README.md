@@ -110,6 +110,18 @@ npm run dev
 
 ---
 
+## 5. Principais Referências Científicas
+
+- **Mekonnen, M. M.; Hoekstra, A. Y.** (2011). *The green, blue and grey water footprint of crops and derived crop products*. Hydrology and Earth System Sciences (HESS), 15, 1577–1600. [doi:10.5194/hess-15-1577-2011](https://doi.org/10.5194/hess-15-1577-2011)
+- **Lathuillière, M. J.; Johnson, M. S.; Galford, G. L.; Couto, E. G.** (2014). *Environmental footprints show China and Europe's evolving resource appropriation for soybean production in Mato Grosso, Brazil*. Environmental Research Letters, 9(7), 074001. [doi:10.1088/1748-9326/9/7/074001](https://doi.org/10.1088/1748-9326/9/7/074001)
+- **Spera, S. A.; Galford, G. L.; Coe, M. T.; Macedo, M. N.; Mustard, J. F.** (2016). *Land-use change affects water recycling in Brazil's last agricultural frontier*. Global Change Biology, 22(10), 3405–3413. [doi:10.1111/gcb.13298](https://doi.org/10.1111/gcb.13298)
+- **Pousa, R.; Costa, M. H.; Pimenta, F. M. et al.** (2019). *Climate Change and Intense Irrigation Growth in Western Bahia, Brazil: The Urgent Need for Hydroclimatic Monitoring*. Water, 11(5), 933. [doi:10.3390/w11050933](https://doi.org/10.3390/w11050933)
+- **Rausch, L. L.; Gibbs, H. K.; Schelly, I. et al.** (2019). *Soy expansion in Brazil's Cerrado*. Conservation Letters, 12(6), e12671. [doi:10.1111/conl.12671](https://doi.org/10.1111/conl.12671)
+- **Allan, J. A.** (1998). *Virtual Water: A Strategic Resource — Global Solutions to Regional Deficits*. Ground Water, 36(4), 545–546.
+- **ANA** (2019/2021). *Manual de Usos Consuntivos da Água no Brasil* & *Atlas Irrigação*. Brasília: ANA / SNIRH.
+
+---
+
 ## Autor
 
 **George Mendes** — Engenheiro Ambiental e Sanitarista · Especialista em Geotecnologias e Desenvolvimento WebGIS  

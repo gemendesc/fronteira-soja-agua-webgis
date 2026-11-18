@@ -1,13 +1,4 @@
 import React from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { formatCompact, formatNumber } from "../bivariate";
 
 interface CountryFlow {
@@ -20,7 +11,18 @@ interface CountryFlow {
 interface Props {
   topCountries: CountryFlow[];
   recorteLabel: string;
-  onQuickJump: (recorte: "matopiba" | "cerrado" | "todos", eixoY: "pegada_soja" | "irrig_hm3" | "comex_ton") => void;
+  onQuickJump: (
+    recorte: "matopiba" | "cerrado" | "todos",
+    eixoY: "pegada_soja" | "irrig_hm3" | "comex_ton"
+  ) => void;
+}
+
+function cleanCountryName(name: string): string {
+  return name
+    .replace(/\s*\(Holanda\)/i, "")
+    .replace(/\s*\(Formosa\)/i, "")
+    .replace(/,\s*Província da China/i, "")
+    .trim();
 }
 
 export const EditorialFindings: React.FC<Props> = ({
@@ -28,6 +30,10 @@ export const EditorialFindings: React.FC<Props> = ({
   recorteLabel,
   onQuickJump,
 }) => {
+  const cleanRecorteTitle = recorteLabel.replace(/\s*\([^)]*\)\s*$/, "").trim();
+  const maxWater = Math.max(...topCountries.map((c) => c.agua_virtual_hm3), 1);
+  const sumTopWater = topCountries.reduce((acc, c) => acc + c.agua_virtual_hm3, 0) || 1;
+
   return (
     <section className="editorial-section">
       <div className="container">
@@ -49,7 +55,7 @@ export const EditorialFindings: React.FC<Props> = ({
             <p>
               Quando observamos os dois biomas inteiros de uma só vez, a correlação de Spearman entre
               supressão recente (PRODES) e produção física de soja (PAM/IBGE) é{" "}
-              <strong>positiva e moderada (ρ = +0,33; p &lt; 0,0001)</strong>. Isso ocorre porque o Centro-Sul
+              <strong>positiva e moderada (ρ = +0,34; p &lt; 0,0001)</strong>. Isso ocorre porque o Centro-Sul
               do Cerrado (Goiás, Mato Grosso do Sul, Triângulo Mineiro e São Paulo — classe{" "}
               <strong>C1</strong>, em azul-petróleo no mapa) colhe volumes expressivos hoje sobre terras cuja
               vegetação nativa foi convertida <em>antes de 2013</em>.
@@ -150,42 +156,44 @@ export const EditorialFindings: React.FC<Props> = ({
               <div className="countries-card">
                 <div className="countries-head">
                   <span className="mono-label">DESTINO INTERNACIONAL · COMEX STAT</span>
-                  <h4>Compradores da água virtual ({recorteLabel})</h4>
+                  <h4>Compradores da água virtual — {cleanRecorteTitle}</h4>
                 </div>
-                <ResponsiveContainer width="100%" height={255}>
-                  <BarChart
-                    data={topCountries}
-                    layout="vertical"
-                    margin={{ top: 4, right: 16, bottom: 4, left: 18 }}
-                  >
-                    <CartesianGrid strokeDasharray="2 2" stroke="#cbd0cc" />
-                    <XAxis
-                      type="number"
-                      tick={{ fill: "#3d454b", fontSize: 11, fontFamily: "IBM Plex Mono" }}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="pais"
-                      width={105}
-                      tick={{ fill: "#1e2328", fontSize: 11, fontWeight: 500 }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: "#1e2328",
-                        color: "#eceeeb",
-                        border: "none",
-                        borderRadius: 2,
-                        fontSize: 12,
-                      }}
-                      formatter={(val: any) => [`${formatNumber(Number(val), 1)} hm³`, "Água Virtual"]}
-                    />
-                    <Bar dataKey="agua_virtual_hm3" fill="#24506b" />
-                  </BarChart>
-                </ResponsiveContainer>
+
+                <div className="country-bars-list" role="list">
+                  {topCountries.map((c, idx) => {
+                    const widthPct = Math.max(2, (c.agua_virtual_hm3 / maxWater) * 100);
+                    const shareTop = (c.agua_virtual_hm3 / sumTopWater) * 100;
+                    const volKm3 = c.agua_virtual_hm3 / 1000;
+                    return (
+                      <div key={c.pais} className="country-bar-row" role="listitem">
+                        <div className="country-bar-meta">
+                          <span className="country-rank">
+                            {String(idx + 1).padStart(2, "0")} · <strong>{cleanCountryName(c.pais)}</strong>
+                          </span>
+                          <span className="country-values">
+                            {volKm3 >= 1
+                              ? `${formatNumber(volKm3, 1)} km³`
+                              : `${formatNumber(c.agua_virtual_hm3, 0)} hm³`}{" "}
+                            <small>({formatNumber(shareTop, 1)}%)</small>
+                          </span>
+                        </div>
+                        <div className="country-bar-track">
+                          <div
+                            className="country-bar-fill"
+                            style={{ width: `${widthPct.toFixed(1)}%` }}
+                          />
+                        </div>
+                        <div className="country-sub-ton">
+                          {formatCompact(c.exp_soja_ton, 1)} t de soja · US$ {formatCompact(c.exp_fob_usd, 1)}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
                 <p className="chart-caption">
-                  Volume estimado de água virtual embarcada (hm³ = milhões de m³) a partir dos fluxos
-                  municipais declarados no recorte selecionado. A China responde sozinha por mais de 70% da
-                  demanda externa.
+                  Volume estimado de água virtual embarcada (1 km³ = 1.000 hm³ = 1 bilhão de m³) entre os 8
+                  maiores compradores declarados no recorte ativo.
                 </p>
               </div>
             </div>
@@ -194,7 +202,7 @@ export const EditorialFindings: React.FC<Props> = ({
 
         {/* Bloco honesto de limitações */}
         <div className="limitations-box">
-          <span className="mono-label">LIMITAÇÕES E PRÓXIMOS PASSOS ANALÍTICOS</span>
+          <span className="mono-label">LIMITAÇÕES METODOLÓGICAS DO ESTUDO</span>
           <p>
             <strong>O que este estudo NÃO prova sozinho:</strong> (1) A correlação em nível municipal mostra
             coocorrência territorial, mas não substitui o cruzamento espacial polígono a polígono (como
@@ -203,7 +211,7 @@ export const EditorialFindings: React.FC<Props> = ({
             irrigação da ANA (SNIRH) retratam a demanda de todo o setor agrícola irrigado municipal (incluindo
             algodão, milho, café e feijão em rotação nos mesmos pivôs), e a série pós-2020 incorpora projeções
             oficiais do Manual de Usos Consuntivos; (3) Para atribuir fluxos comerciais a municípios sem sede
-            exportadora, modelos como o <em> SEI-PCS / Trase</em> combinam matrizes logísticas de rodovias,
+            exportadora, modelos como o <em>SEI-PCS / Trase</em> combinam matrizes logísticas de rodovias,
             armazéns e portos.
           </p>
         </div>

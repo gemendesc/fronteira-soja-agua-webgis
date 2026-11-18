@@ -1047,7 +1047,166 @@ body {
 .countries-head h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  margin: 0.2rem 0 0.6rem;
+  margin: 0.2rem 0 0.75rem;
+}
+
+/* Barras Proporcionais de Países (100% legíveis, sem corte de rótulos) */
+.country-bars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.country-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.country-bar-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.country-bar-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+}
+
+.country-rank {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.country-rank strong {
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.country-values {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--accent-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.country-values small {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.country-bar-track {
+  width: 100%;
+  height: 7px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.country-bar-fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.country-sub-ton {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+/* 04 · Seção de Revisão da Literatura e Referências */
+.literature-section {
+  padding-block: clamp(2.8rem, 5.5vw, 4.4rem);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.lit-synthesis-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  margin-top: 1.8rem;
+}
+
+.lit-pillar {
+  background: var(--paper);
+  border: 1px solid var(--border-strong);
+  border-top: 2px solid var(--accent-ink);
+  padding: 1.25rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.lit-pillar h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.26;
+  color: var(--ink);
+}
+
+.lit-pillar p {
+  font-size: 0.9rem;
+  line-height: 1.62;
+  color: var(--ink-2);
+}
+
+.references-block {
+  margin-top: 2rem;
+  background: var(--paper);
+  border: 1px solid var(--border-strong);
+  padding: clamp(1.25rem, 2.5vw, 1.8rem);
+}
+
+.ref-heading {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-strong);
+  margin-bottom: 1rem;
+}
+
+.ref-list {
+  padding-left: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.ref-item {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.ref-doi {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--accent-ink);
+  text-decoration: none;
+  margin-left: 0.35rem;
+}
+
+.ref-doi:hover {
+  text-decoration: underline;
+}
+
+.ref-note {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .limitations-box {
@@ -1199,7 +1358,8 @@ body {
   .hero-columns,
   .findings-grid,
   .wide-split,
-  .atlas-frame {
+  .atlas-frame,
+  .lit-synthesis-grid {
     grid-template-columns: 1fr;
   }
   .metrics-strip {

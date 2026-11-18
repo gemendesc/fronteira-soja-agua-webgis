@@ -4,6 +4,7 @@ import { AnalyticsPanel } from "./components/AnalyticsPanel";
 import { BivariateLegend } from "./components/BivariateLegend";
 import { BivariateMap } from "./components/BivariateMap";
 import { EditorialFindings } from "./components/EditorialFindings";
+import { LiteratureSection } from "./components/LiteratureSection";
 import { MethodologyModal } from "./components/MethodologyModal";
 import { MunicipalityDrawer } from "./components/MunicipalityDrawer";
 import type {
@@ -164,7 +165,8 @@ export const App: React.FC = () => {
           <nav className="header-nav">
             <a href="#objetivo">Objetivo</a>
             <a href="#atlas">Mapa Interativo</a>
-            <a href="#conclusoes">O que os dados mostram</a>
+            <a href="#conclusoes">Conclusões</a>
+            <a href="#referencias">Literatura</a>
             <button type="button" className="text-nav-btn" onClick={() => setModalOpen(true)}>
               Nota Técnica & SQL
             </button>
@@ -411,6 +413,9 @@ export const App: React.FC = () => {
           onQuickJump={handleQuickJump}
         />
       </div>
+
+      {/* 04 · Embasamento Científico e Revisão Bibliográfica */}
+      <LiteratureSection />
 
       {/* Rodapé Técnico Alinhado ao Portfólio */}
       <footer className="site-footer">
