@@ -1,0 +1,30 @@
+{
+  "name": "fronteira-soja-agua-webgis",
+  "private": true,
+  "version": "1.0.0",
+  "description": "WebGIS analítico investigando desmatamento (PRODES/INPE), exportação de soja (Comex Stat/PAM-IBGE) e exportação de água virtual / irrigação (SNIRH/ANA) nos biomas Amazônia e Cerrado.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "lucide-react": "^0.468.0",
+    "maplibre-gl": "^4.7.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.15.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vercel/node": "^3.2.26",
+    "@vitejs/plugin-react": "^4.3.4",
+    "dotenv": "^16.4.7",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
+  }
+}

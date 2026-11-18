@@ -1,0 +1,25 @@
+# Credenciais e variáveis locais (NUNCA versionar)
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel/
+
+# Node / Frontend
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Python / ETL
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+etl/data/raw/
+etl/data/processed/
+
+# Sistema
+.DS_Store
+Thumbs.db
