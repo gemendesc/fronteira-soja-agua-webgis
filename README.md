@@ -2,6 +2,7 @@
 
 Plataforma WebGIS de ponta a ponta desenvolvida para investigar espacialmente e estatisticamente o acoplamento entre **supressão de vegetação nativa (PRODES/INPE)**, **expansão agroexportadora de soja (Comex Stat / PAM-IBGE)** e **pressão sobre recursos hídricos — irrigação agrícola e exportação de água virtual (SNIRH/ANA)** nos **1.873 municípios** dos biomas **Amazônia e Cerrado** (`2013–2024`).
 
+[![Demo Online](https://img.shields.io/badge/Acessar_WebGIS-webgis--soja.georgemendes.net-14a3b8?style=flat-square)](https://webgis-soja.georgemendes.net)
 ![PostGIS](https://img.shields.io/badge/PostGIS_3.5-Neon_Serverless-24292f?style=flat-square&logo=postgresql&logoColor=white)
 ![Python ETL](https://img.shields.io/badge/ETL-Python_%2F_GeoPandas-24292f?style=flat-square&logo=python&logoColor=white)
 ![MapLibre GL](https://img.shields.io/badge/WebGIS-MapLibre_GL_JS-24292f?style=flat-square&logo=maplibre&logoColor=white)
